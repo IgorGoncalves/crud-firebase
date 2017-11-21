@@ -1,6 +1,5 @@
 var App = {
-    component: {},
-    bag:{},
+    manager: {},    
     models: {
         User: function (name = '', email = '', imageUrl = ''){
             return {
@@ -31,7 +30,7 @@ var App = {
 }
 
 
-App.component.database = (function() {    
+App.manager = (function() {    
        App.init.firebase();       
        var database = firebase.database();
        return {
@@ -75,14 +74,14 @@ var vm = new Vue({
     methods: {
         remove: function (index) {
           // `this` inside methods point to the Vue instance
-            App.component.database.user.removeByIndex(index);
+            App.manager.user.removeByIndex(index);
         }
       }
 });    
 
 
 (function() {    
-    var daoUser = App.component.database.user;        
+    var daoUser = App.manager.user;        
     daoUser.addOrUpdate(2, "beatriz", "beatriz_carvalho@gmail.com", "");
     daoUser.addOrUpdate(1, "Igor", "igorgoncalves@gmail.com", "");
     daoUser.addOrUpdate(3, "marreta", "marreta@gmail.com", "");
