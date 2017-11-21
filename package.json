@@ -3,8 +3,12 @@
   "engines": {
     "node": ">=4"
   },
-  "scripts": {   
-    "heroku-postbuild": "gulp"
+  "scripts": {       
+    "heroku-postbuild": "gulp",
+    "postinstall": "./node_modules/bower/bin/bower install" 
+  },
+  "dependencies": {
+    "bower": "1.8.0" 
   },
   "devDependencies": {
     "babel-core": "^6.4.0",
