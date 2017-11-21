@@ -1,7 +1,8 @@
 var App = {
     component: {},
+    bag:{},
     models: {
-        User: function (name = "", email = "", imageUrl = ""){
+        User: function (name = '', email = '', imageUrl = ''){
             return {
                 username: name,
                 email: email,
@@ -24,10 +25,11 @@ var App = {
                     messagingSenderId: '400796967793'
                 };                            
                 firebase.initializeApp(config);               
-            },               
+            },        
         };  
  })()
 }
+
 
 App.component.database = (function() {    
        App.init.firebase();       
@@ -35,15 +37,29 @@ App.component.database = (function() {
        return {
            user: (function(){
                return {
-                   addOrUpdate:  function (userId, name, email, imageUrl) {            
-                        var newUser = new App.models.User(name, email, imageUrl);
-                        console.log(newUser);
+                    addOrUpdate:  function (userId, name, email, imageUrl) {            
+                        var newUser = new App.models.User(name, email, imageUrl);                        
                         database.ref('users/' + userId).set(newUser);
                     },
-                    getAll: function (){
-                        database.ref("users").on('value', function(snap){
-                            console.log(snap.val());
+                    getAll: function (callback){
+                        return database.ref('users').on('value', function(snap){
+                            var snapUsers = snap.val();
+                            if(snapUsers !== null){
+                                if(!snapUsers instanceof Array) snapUsers = [snapUsers];                            
+                                snapUsers = snapUsers.filter(function (v, k){
+                                    if(v != undefined){
+                                        v.id = k
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                            }
+                            console.log(snap.val())
+                            callback(snapUsers);
                         });
+                    },
+                    removeByIndex: function (index){
+                        database.ref('users/' + vm.users[index].id).set(null);
                     }
                }
            })()
@@ -51,10 +67,29 @@ App.component.database = (function() {
 })();
 
 
+var vm = new Vue({
+    el: '#app',
+    data: {
+        users:[]
+    },
+    methods: {
+        remove: function (index) {
+          // `this` inside methods point to the Vue instance
+            App.component.database.user.removeByIndex(index);
+        }
+      }
+});    
+
+
 (function() {    
     var daoUser = App.component.database.user;        
     daoUser.addOrUpdate(2, "beatriz", "beatriz_carvalho@gmail.com", "");
-    daoUser.getAll();
+    daoUser.addOrUpdate(1, "Igor", "igorgoncalves@gmail.com", "");
+    daoUser.addOrUpdate(3, "marreta", "marreta@gmail.com", "");
+    daoUser.getAll(function(users){
+        vm.users = users;        
+    });    
+
 })();
 
 
