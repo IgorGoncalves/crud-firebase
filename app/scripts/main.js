@@ -80,9 +80,9 @@ var vm = new Vue({
           // `this` inside methods point to the Vue instance
             App.manager.user.removeByIndex(index);
         },
-        toedit: function (user){            
-            this.user = _.clone(user);
-            this.idEdit = true;
+        toedit: function (user){      
+            this.isEdit = true;      
+            this.user = _.clone(user);            
         },
         edit: function (){
             App.manager.user.addOrUpdate(this.user.userid, this.user.username, this.user.email, this.user.profile_picture); 
@@ -104,6 +104,3 @@ var vm = new Vue({
     });    
 
 })();
-
-
-
