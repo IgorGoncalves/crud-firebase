@@ -53,7 +53,9 @@ App.manager = (function() {
                                     }
                                     return false;
                                 });
-                            }                                                        
+                            }
+                            console.log(snap.val())
+                            callback(snapUsers);
                         });
                     },                    
                     removeByIndex: function (index){
@@ -80,7 +82,7 @@ var vm = new Vue({
         },
         toedit: function (user){            
             this.user = _.clone(user);
-            this.isEdit = true;
+            this.idEdit = true;
         },
         edit: function (){
             App.manager.user.addOrUpdate(this.user.userid, this.user.username, this.user.email, this.user.profile_picture); 
@@ -90,7 +92,6 @@ var vm = new Vue({
         add: function (){
             var maxId = _.maxBy(this.users, 'userid').userid;
             App.manager.user.addOrUpdate(maxId+1, this.user.username, this.user.email);
-            this.user = {};
         }
       }
 });    
