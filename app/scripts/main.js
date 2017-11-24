@@ -1,8 +1,9 @@
 var App = {
     manager: {},    
     models: {
-        User: function (name = '', email = '', imageUrl = ''){
+        User: function (id = '', name = '', email = '', imageUrl = ''){
             return {
+                userid : id,
                 username: name,
                 email: email,
                 profile_picture : imageUrl
@@ -37,7 +38,7 @@ App.manager = (function() {
            user: (function(){
                return {
                     addOrUpdate:  function (userId, name, email, imageUrl) {            
-                        var newUser = new App.models.User(name, email, imageUrl);                        
+                        var newUser = new App.models.User(userId, name, email, imageUrl);
                         database.ref('users/' + userId).set(newUser);
                     },
                     getAll: function (callback){
@@ -47,18 +48,16 @@ App.manager = (function() {
                                 if(!snapUsers instanceof Array) snapUsers = [snapUsers];                            
                                 snapUsers = snapUsers.filter(function (v, k){
                                     if(v != undefined){
-                                        v.id = k
+                                        v.userid = k
                                         return true;
                                     }
                                     return false;
                                 });
-                            }
-                            console.log(snap.val())
-                            callback(snapUsers);
+                            }                                                        
                         });
-                    },
+                    },                    
                     removeByIndex: function (index){
-                        database.ref('users/' + vm.users[index].id).set(null);
+                        database.ref('users/' + vm.users[index].userid).set(null);
                     }
                }
            })()
@@ -69,24 +68,38 @@ App.manager = (function() {
 var vm = new Vue({
     el: '#app',
     data: {
-        users:[]
+        users:[],
+        user:{},
+        isEdit: false
+
     },
     methods: {
         remove: function (index) {
           // `this` inside methods point to the Vue instance
             App.manager.user.removeByIndex(index);
+        },
+        toedit: function (user){            
+            this.user = _.clone(user);
+            this.isEdit = true;
+        },
+        edit: function (){
+            App.manager.user.addOrUpdate(this.user.userid, this.user.username, this.user.email, this.user.profile_picture); 
+            this.user = {};
+            this.isEdit = false;
+        },
+        add: function (){
+            var maxId = _.maxBy(this.users, 'userid').userid;
+            App.manager.user.addOrUpdate(maxId+1, this.user.username, this.user.email);
+            this.user = {};
         }
       }
 });    
 
 
 (function() {    
-    var daoUser = App.manager.user;        
-    daoUser.addOrUpdate(2, "beatriz", "beatriz_carvalho@gmail.com", "");
-    daoUser.addOrUpdate(1, "Igor", "igorgoncalves@gmail.com", "");
-    daoUser.addOrUpdate(3, "marreta", "marreta@gmail.com", "");
+    var daoUser = App.manager.user;
     daoUser.getAll(function(users){
-        vm.users = users;        
+        vm.users = users;
     });    
 
 })();
